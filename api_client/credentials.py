@@ -3,10 +3,23 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 class APICredentials:
+    """
+    Class defining credentials needed for API Client to access the API on behalf of our app
+    Attributes:
+        SCOPES (str): Access level we are requesting (e.g. read only)
+        credentials_filepath (str): filepath of JSON file containing Client ID and Client Secret for our app
+        token_filepath (str): filepath of JSON file containing access token and refresh token for user
+
+    """
     def __init__(self, SCOPES:list):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+        """
+        Constructor for APICredentials class
+        Parameters:
+            SCOPES (str): Access level we are requesting (e.g. read only)
+        """
         self.SCOPES = SCOPES
         self.credentials_filepath = os.path.join(current_dir, '../config/credentials.json')
         self.token_filepath = os.path.join(current_dir, '../config/token.json')
@@ -14,6 +27,10 @@ class APICredentials:
         
 
     def generate_credentials(self):
+        """
+        Utilizes credentials.json and token.json to create credentials for our app
+        If no user authentication created yet, calls initialize_authentication to create tokens
+        """
         creds = None
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
@@ -36,6 +53,9 @@ class APICredentials:
         return creds
     
     def initialize_authentication(self):
+        """
+        Prompts user to authenticate access, generating access and refresh tokens
+        """
         # Initialize OAuth client
         flow = InstalledAppFlow.from_client_secrets_file(
             self.credentials_filepath, self.SCOPES
@@ -44,4 +64,4 @@ class APICredentials:
         new_creds = flow.run_local_server(port=0)
         return new_creds
     
-creds = APICredentials(SCOPES=["https://www.googleapis.com/auth/gmail.readonly"])
+gmail_creds = APICredentials(SCOPES=["https://www.googleapis.com/auth/gmail.readonly"]).creds
