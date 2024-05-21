@@ -8,6 +8,7 @@ class Subscriber:
     Attributes:
         project_id (str): Project ID for Google Cloud project
         subscription_id (str): Subscription ID for Google Cloud subscription
+        sub_client (pubsub_v1.SubscriberClient): Client responsible for generating pull request to Pub/Sub subscription
     """
     def __init__(self, project_id:str, subscription_id:str, sub_client:pubsub_v1.SubscriberClient):
         """
@@ -86,4 +87,4 @@ class GmailSubscriber(Subscriber):
             message.nack()
 
 
-gmail_subscriber = GmailSubscriber()
+gmail_subscriber = GmailSubscriber(project_id="blitzy-ocr-api", subscription_id="gmail-subscription", sub_client=pubsub_v1.SubscriberClient())
