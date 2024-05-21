@@ -50,11 +50,10 @@ class GmailClient(APIClient):
         client = build(serviceName=self.api_name, version=self.api_version, credentials=self.api_creds)
         return client
 
-gmail_client = GmailClient(api_creds=gmail_creds)
+gmail_client = GmailClient(api_creds=gmail_creds).client
 
 if __name__ == "__main__":
     test_gmail_client = GmailClient(api_creds=gmail_creds)
     print(f"Test case initialized: {test_gmail_client}")
-    
 
 

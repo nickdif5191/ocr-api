@@ -38,10 +38,10 @@ class GmailPublisher(Publisher):
         """
         request = {
             'labelIds': [inbox_label],
-            'topicName': f"projects/{self.project_id}/topics/{self.topic_id}",
+            'topicName': f"projects/blitzy-ocr-api/topics/gmail-topic",
             'labelFilterBehavior': 'INCLUDE'
             }
-        execute = self.api_client.client.users().watch(userId='me', body=request).execute()
+        execute = self.api_client.users().watch(userId='me', body=request).execute()
         print(execute)
 
 gmail_publisher = GmailPublisher(project_id="blitzy-ocr-api", topic_id="gmail-topic", api_client=gmail_client, inbox_label="Label_6952034271687541778ß")
