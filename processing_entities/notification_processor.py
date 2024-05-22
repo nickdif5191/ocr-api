@@ -32,9 +32,9 @@ class NotificationProcessor():
     
     def callback(self, message:pubsub_v1.subscriber.message.Message):
         # Decode message from subscription
-        decoded_notification = message.data.decode('utf-8')
+        decoded_message = message.data.decode('utf-8')
         # Process message
-        email_msg = self.process_notification(decoded_msg=decoded_notification)
+        email_msg = self.process_notification(decoded_msg=decoded_message)
         # Publish message
         self.publish_messages(msg_to_publish=email_msg)
         message.ack()
@@ -83,27 +83,6 @@ class NotificationProcessor():
                 return file.read().strip()
         except FileNotFoundError:
             return None
-
-    # def get_all_new_notifications(self, new_history_id:str):
-    #     """
-    #     Gets a comprehensive list of new notifications from Gmail inbox since our last notification
-    #     Note: list includes ALL notifications, which includes internal updates/notifications
-    #     """
-    #     # Get historyId from the previous notification
-    #     last_history_id = self.get_last_history_id()
-    #     # Store current historyId for future use
-    #     self.store_history_id(historyId=new_history_id)
-    #     if last_history_id:
-    #         # Return list of Gmail events since previous notification
-    #         history_response = gmail_client.users().history().list(userId='me', startHistoryId=last_history_id).execute() 
-    #         if 'history' in history_response:
-    #             return history_response['history'] # a list of History records
-    #         else:
-    #             print("No new notifications found.")
-    #     else:
-    #         # logging.info("No previous historyId found.")   
-    #         return None
-    
 
 notification_processor = NotificationProcessor(input_subscription_name="gmail-inbox-topic-sub", 
                                                output_topic_name="gmail-all-notification-topic",
