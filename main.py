@@ -1,10 +1,16 @@
 from api_client.client import gmail_client
-from pubsub_interaction.publisher import gmail_publisher
-from pubsub_interaction.subscriber import gmail_subscriber
-# from App.email_processing.notification_processor import gmail_notification_processor
-# from App.email_processing.attachment_extractor import attachment_extractor
+from processing_entities.inbox_watcher import inbox_watcher
+from processing_entities.notification_processor import notification_processor
 
-print(f"Gmail Client initialized: {gmail_client}")
-print(f"Gmail Publisher initialized: {gmail_publisher}")
-print(f"Gmail Subscriber initialized: {gmail_subscriber}")
-gmail_subscriber.initiate_pull()
+if gmail_client:
+    print(f"Gmail Client initialized\n")
+    # labels = gmail_client.users().labels().list(userId="me").execute()
+    # print(labels)
+if inbox_watcher:
+    print(f"Inbox Watcher initialized")
+    inbox_watcher.watch(inbox_label=inbox_watcher.inbox_label)
+    print("\n")
+if notification_processor:
+    print(f"Notification Processor initialized")
+    notification_processor.initiate_pull()
+    print("\n")
