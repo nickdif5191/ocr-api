@@ -2,6 +2,7 @@ from api_client.client import gmail_client
 from processing_entities.inbox_watcher import inbox_watcher
 from processing_entities.notification_processor import notification_processor
 from processing_entities.notification_filter import notification_filter
+from processing_entities.attachment_extractor import attachment_extractor
 
 if gmail_client:
     print(f"Gmail Client initialized\n")
@@ -19,3 +20,7 @@ if notification_filter:
     print("Notification Filter initialized")
     notification_filter.initiate_pull()
     print("\n")
+if attachment_extractor:
+    print("Attachment Extractor initialized")
+    attachment_extractor.initiate_pull()
+    print("\n")    

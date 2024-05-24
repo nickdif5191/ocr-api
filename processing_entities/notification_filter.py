@@ -43,14 +43,8 @@ class NotificationFilter:
             notification_type (str): Specific category of notification we wish to identify (e.g. 'messagesAdded', 'labelsAdded')
         """
         if new_notifications:
-            relevant_notifications = [item for item in new_notifications if self.notification_type in item]
+            relevant_notifications = [item[self.notification_type] for item in new_notifications if self.notification_type in item]
             return relevant_notifications
-            # if self.notification_type in new_notifications:
-            #     relevant_notifications = new_notifications[self.notification_type]
-            #     return relevant_notifications # list of objects corresponding to notification_type (e.g. MessageAdded, LabelAdded, MessageDeleted)
-            # else:
-            #     # logging.info("No relevant notifications found in new notifications")
-            #     pass
         else:
             # logging.info("No new notifications observed since previous historyId")
             pass
