@@ -1,9 +1,9 @@
 from concurrent.futures import ThreadPoolExecutor
 from api_client.client import gmail_client
 from processing_entities.inbox_watcher import inbox_watcher
-from processing_entities.notification_processor import notification_processor
-from processing_entities.notification_filter import notification_filter
-from processing_entities.attachment_extractor import attachment_extractor
+from subscription_entities.notification_processor import notification_processor
+from subscription_entities.notification_filter import notification_filter
+from subscription_entities.attachment_extractor import attachment_extractor
 
 entities = []
 entities.append(notification_processor)
