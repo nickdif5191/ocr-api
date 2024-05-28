@@ -14,6 +14,7 @@ class SubscriptionEntity:
         self.subscriber = pubsub_v1.SubscriberClient()
         self.publisher = pubsub_v1.PublisherClient()
         self.input_subscription_path = self.subscriber.subscription_path(project=config.project_id, subscription=input_subscription_name)
+        self.output_topic_name = output_topic_name
         if output_topic_name:
             self.output_subscription_path = self.publisher.topic_path(project=config.project_id, topic=output_topic_name)
         self.streaming_pull_future = None
@@ -36,7 +37,8 @@ class SubscriptionEntity:
     def callback(self, message:pubsub_v1.subscriber.message.Message):
         deserialized_message = self.deserialize_incoming_message(message=message)
         processed_message = self.processing_task(deserialized_message=deserialized_message)
-        self.publish_messages(msg_to_publish=processed_message)
+        if self.output_topic_name:
+            self.publish_messages(msg_to_publish=processed_message)
         message.ack()
 
     def deserialize_incoming_message(self, message:pubsub_v1.subscriber.message.Message):
