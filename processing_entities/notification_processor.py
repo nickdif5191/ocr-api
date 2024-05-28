@@ -14,21 +14,25 @@ class NotificationProcessor():
         self.last_history_id_filename = last_history_id_filename
         self.input_subscription_path = self.subscriber.subscription_path(project=config.project_id, subscription=input_subscription_name)
         self.output_subscription_path = self.publisher.topic_path(project=config.project_id, topic=output_topic_name)
+        self.streaming_pull_future = None
+        self.name = self.__class__.__name__
 
     def initiate_pull(self):
         # uses 'subscriber' attribute
-        streaming_pull_future = self.subscriber.subscribe(subscription=self.input_subscription_path, callback=self.callback)
-        print(f"Subscriber pull initiated. Listening for messages on {self.input_subscription_path}..\n")
+        self.streaming_pull_future = self.subscriber.subscribe(subscription=self.input_subscription_path, callback=self.callback)
+        print(f"{self.name} listening for messages on {self.input_subscription_path}.\n")
         # logging.info(f"Notification Processor pull initiated. Listening for messages on {self.subscriber.subscription_path(config.project_id, subscription=self.input_subscription_name)}..\n")
 
         with self.subscriber:
-            try:
-                # Blocks rest of code from running so our pull request is continuously active
-                streaming_pull_future.result()
-            except KeyboardInterrupt:
-                print("KEYBOARD INTERRUPT. NO LONGER LISTENING FOR MESSAGES.")
-                streaming_pull_future.cancel()  # Trigger shutdown
-                streaming_pull_future.result()  # Block until shutdown is complete
+            # Blocks rest of code from running so our pull request is continuously active
+            self.streaming_pull_future.result()
+
+    def shutdown(self):
+        if self.streaming_pull_future:
+            self.streaming_pull_future.cancel()  # Gracefully stop the pull
+            self.streaming_pull_future.result()  # Wait for the cancellation to complete
+            print(f"{self.name} pull operation stopped.")
+
     
     def callback(self, message:pubsub_v1.subscriber.message.Message):
         # Decode message from subscription
@@ -40,7 +44,7 @@ class NotificationProcessor():
         message.ack()
 
     def basic_callback(self, message: pubsub_v1.subscriber.message.Message) -> None:
-        print(f"Received {message}.")
+        print(f"{self.name}: Received {message}.")
         message.ack()
     
     
@@ -68,7 +72,7 @@ class NotificationProcessor():
         encoded_data = json_data.encode('utf-8')
         # Publish message
         future = self.publisher.publish(topic=self.output_subscription_path, data=encoded_data)
-        print(f"Published message ID: {future.result()}")
+        print(f"{self.name} published message ID: {future.result()}\n")
     
     def store_history_id(self, historyId):
         with open(self.last_history_id_filename, mode="w") as file:

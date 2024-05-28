@@ -9,21 +9,25 @@ class AttachmentExtractor():
         self.subscriber = pubsub_v1.SubscriberClient()
         self.input_subscription_path = self.subscriber.subscription_path(project=config.project_id, subscription=input_subscription_name)
         self.subscriber = pubsub_v1.SubscriberClient()
+        self.streaming_pull_future = None
+        self.name = self.__class__.__name__
 
     def initiate_pull(self):
         # uses 'subscriber' attribute
-        streaming_pull_future = self.subscriber.subscribe(subscription=self.input_subscription_path, callback=self.callback)
-        print(f"Subscriber pull initiated. Listening for messages on {self.input_subscription_path}..\n")
+        self.streaming_pull_future = self.subscriber.subscribe(subscription=self.input_subscription_path, callback=self.callback)
+        print(f"{self.name} listening for messages on {self.input_subscription_path}.\n")
         # logging.info(f"Notification Processor pull initiated. Listening for messages on {self.subscriber.subscription_path(config.project_id, subscription=self.input_subscription_name)}..\n")
 
         with self.subscriber:
-            try:
-                # Blocks rest of code from running so our pull request is continuously active
-                streaming_pull_future.result()
-            except KeyboardInterrupt:
-                print("KEYBOARD INTERRUPT. NO LONGER LISTENING FOR MESSAGES.")
-                streaming_pull_future.cancel()  # Trigger shutdown
-                streaming_pull_future.result()  # Block until shutdown is complete
+            # Blocks rest of code from running so our pull request is continuously active
+            self.streaming_pull_future.result()
+
+
+    def shutdown(self):
+        if self.streaming_pull_future:
+            self.streaming_pull_future.cancel()  # Gracefully stop the pull
+            self.streaming_pull_future.result()  # Wait for the cancellation to complete
+            print(f"{self.name} pull operation stopped.")
     
     def basic_callback(self, message: pubsub_v1.subscriber.message.Message) -> None:
         print(f"Received {message}.")
@@ -36,10 +40,14 @@ class AttachmentExtractor():
         # Output attachments
         for new_email in deserialized_message:
             msg_parts = self.get_message_parts(email=new_email) 
+            parts_w_attachments = 0
             for part in msg_parts:
                 if part['filename']:
+                    parts_w_attachments += 1
                     attachment_data = self.extract_attachment_data(msg_part=part, msg_id=new_email)
-                    self.output_attachment(attachment_data=attachment_data, filename=part['filename'])
+                    self.output_attachment(attachment_data=attachment_data, filename=part['filename']) 
+            if parts_w_attachments == 0:
+                print(f"{self.name} no attachments in this message\n") 
         message.ack()
 
     def get_message_parts(self, email):
@@ -79,6 +87,6 @@ class AttachmentExtractor():
         with open(path, 'wb') as f:
             f.write(file_data)
         # logging.info(f"Attachment {filename} saved to {path}")
-        print(f"Attachment {filename} saved to {path}")
+        print(f"{self.name} attachment {filename} saved to {path}\n")
 
 attachment_extractor = AttachmentExtractor(input_subscription_name="gmail-relevant-notification-topic-sub")
