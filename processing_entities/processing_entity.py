@@ -72,8 +72,9 @@ class ProcessingEntity:
                 self.publish_messages(msg_to_publish=processed_message)
             # Acknowledge receipt of message
             message.ack()
-        except:
+        except Exception as e:
             # If error occurs during callback functions, DO NOT acknolwedge the message, making it remain in the queue
+            print(f"Message not acknowledged. Error: {e}")
             message.nack()
 
     def deserialize_incoming_message(self, message:pubsub_v1.subscriber.message.Message):

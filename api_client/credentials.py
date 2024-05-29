@@ -1,4 +1,5 @@
 import os.path
+from utils.config_manager import config
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -23,7 +24,7 @@ class APICredentials:
         """
         self.SCOPES = SCOPES
         self.credentials_filepath = os.path.join(current_dir, '../config/credentials.json')
-        self.token_filepath = os.path.join(current_dir, '../config/token.json')
+        self.token_filepath = os.path.join(current_dir, f"../config/tokens/{config.username}_token.json")
         self.creds = self.generate_credentials()
         
 

@@ -43,16 +43,19 @@ class AttachmentExtractor(ProcessingEntity):
         Parameters:
             relevant_messages (list): list of email messages to extract attachments from 
         """
-        for email in relevant_messages:
-            msg_parts = self.get_message_parts(email=email) 
-            parts_w_attachments = 0
-            for part in msg_parts:
-                if part['filename']:
-                    parts_w_attachments += 1
-                    attachment_data = self.get_attachment_data(msg_part=part, msg_id=email)
-                    self.output_attachment(attachment_data=attachment_data, output_loc='attachments', filename=part['filename']) 
-            if parts_w_attachments == 0:
-                print(f"{self.name} no attachments in this message\n") 
+        if relevant_messages:
+            for email in relevant_messages:
+                msg_parts = self.get_message_parts(email=email) 
+                parts_w_attachments = 0
+                for part in msg_parts:
+                    if part['filename']:
+                        parts_w_attachments += 1
+                        attachment_data = self.get_attachment_data(attachment_content=part, msg_id=email)
+                        self.output_attachment(attachment_data=attachment_data, output_loc='attachments', filename=part['filename']) 
+                if parts_w_attachments == 0:
+                    print(f"{self.name} no attachments in this message\n") 
+        else:
+            print("No new messages are relevant")
     
     def get_message_parts(self, email):
         """

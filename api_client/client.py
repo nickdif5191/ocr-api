@@ -23,6 +23,7 @@ class APIClient:
         self.api_version = api_version
         self.api_creds = api_creds
         self.client = self.create_client()
+        
     
     def create_client(self):
         """
@@ -40,6 +41,7 @@ class GmailClient(APIClient):
             api_version (str): Version of the API to access (set to "v1")
             api_creds (APICredentials): Credentials required to access API 
             client (googleapiclient.discovery.Resource): Client responsible for accessing Gmail API 
+            email_address (str): email address of Gmail user associated with this client
         """ 
         # Call the constructor of the superclass (APIClient) to initialize its attributes
         super().__init__(api_name, api_version, api_creds)

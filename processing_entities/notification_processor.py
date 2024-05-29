@@ -1,7 +1,10 @@
 from processing_entities.processing_entity import ProcessingEntity
 from google.cloud import pubsub_v1
 from api_client.client import gmail_client
-import json
+from utils.config_manager import config
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 class NotificationProcessor(ProcessingEntity):
     """
@@ -34,6 +37,7 @@ class NotificationProcessor(ProcessingEntity):
 
         super().__init__(input_subscription_name, output_topic_name)
         self.last_history_id_filename = last_history_id_filename
+        self.last_history_id_filepath = os.path.join(current_dir, f"../last_history_id_files/{config.username}/last_history_id.txt")
     
     def processing_task(self, deserialized_message: pubsub_v1.subscriber.message.Message):
         """
@@ -62,12 +66,13 @@ class NotificationProcessor(ProcessingEntity):
         if last_history_id:
             # Return list of Gmail events since previous notification
             history_response = gmail_client.users().history().list(userId='me', startHistoryId=last_history_id).execute() 
+
             if 'history' in history_response:
                 return history_response['history'] # a list of History records
             else:
                 print("No new notifications found.")
         else:
-            # logging.info("No previous historyId found.")   
+            print("No previous historyId found. Processing will begin with next notification.")   
             return None
     
     def store_history_id(self, historyId):
@@ -76,8 +81,10 @@ class NotificationProcessor(ProcessingEntity):
         Parameters:
             historyId: history ID associated with newest notification from relevant Gmail label
         """
-
-        with open(self.last_history_id_filename, mode="w") as file:
+        
+        os.makedirs(os.path.dirname(self.last_history_id_filepath), exist_ok=True)
+        
+        with open(self.last_history_id_filepath, mode="w") as file:
             file.write(str(historyId))
     
     def get_last_history_id(self):
@@ -85,7 +92,7 @@ class NotificationProcessor(ProcessingEntity):
         Gets last recorded historyId from last_history_id_filename
         """
         try:
-            with open(self.last_history_id_filename, mode="r") as file:
+            with open(self.last_history_id_filepath, mode="r") as file:
                 return file.read().strip()
         except FileNotFoundError:
             return None
