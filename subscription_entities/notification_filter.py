@@ -28,4 +28,4 @@ class NotificationFilter(SubscriptionEntity):
 
 notification_filter = NotificationFilter(input_subscription_name="gmail-all-notification-topic-sub",
                                          output_topic_name="gmail-relevant-notification-topic",
-                                         notification_type='labelsAdded')
+                                         notification_type='messagesAdded')
