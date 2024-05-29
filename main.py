@@ -1,9 +1,9 @@
 from concurrent.futures import ThreadPoolExecutor
 from api_client.client import gmail_client
 from inbox_watcher.inbox_watcher import inbox_watcher
-from subscription_entities.notification_processor import notification_processor
-from subscription_entities.notification_filter import notification_filter
-from subscription_entities.attachment_extractor import attachment_extractor
+from processing_entities.notification_processor import notification_processor
+from processing_entities.notification_filter import notification_filter
+from processing_entities.attachment_extractor import attachment_extractor
 import pretty_errors
 
 entities = []
@@ -28,7 +28,7 @@ with executor:
     except KeyboardInterrupt:
         print("Interrupted by user")
         for entity in entities:
-            entity.shutdown()
+            entity.shutdown_subscription()
 
 print("Executor shut down.")
 

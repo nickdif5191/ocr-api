@@ -4,8 +4,20 @@ from utils.config_manager import config
 class InboxWatcher():
     """
     Publishes notifications from Gmail API to specified Pub/Sub Project and Topic
+    
+    Attributes:
+        topic_id (str): name of topic we will publish notifications to
+        api_client (APIClient): client that interacts with Gmail API to monitor inbox
+        inbox_label_id (str): ID of the Gmail label we will be monitoring
     """
     def __init__(self, topic_id: str, api_client: APIClient, inbox_label_id:str):
+        """
+        Constructor for InboxWatcher class
+        Parameters:
+            topic_id (str): name of topic we will publish notifications to
+            api_client (APIClient): client that interacts with Gmail API to monitor inbox
+            inbox_label_id (str): ID of the Gmail label we will be monitoring
+        """
         self.topic_id = topic_id
         self.api_client = api_client
         self.inbox_label_id = inbox_label_id
@@ -28,7 +40,10 @@ class InboxWatcher():
     
     def find_label_name(self, labels:list, target_id:str):
         """
-        Function to find the label name
+        Given the ID of a label, find the name of the label
+        Parameters:
+            labels (list): list of dictionary items representing all labels for this Gmail user's inbox
+            target_id (str): ID of the inbox whose name we wish to identify
         """
         for label in labels['labels']:
             if label['id'] == target_id:

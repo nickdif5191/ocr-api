@@ -8,6 +8,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 class APICredentials:
     """
     Class defining credentials needed for API Client to access API on behalf of our app
+    
     Attributes:
         SCOPES (str): Access level we are requesting (e.g. read only)
         credentials_filepath (str): filepath of JSON file containing Client ID and Client Secret for our app

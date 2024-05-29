@@ -4,6 +4,7 @@ from api_client.credentials import APICredentials, gmail_creds
 class APIClient:
     """
     Represents a client that makes calls to a Google API on behalf of our app
+    
     Attributes:
         api_name (str): Name of the API to access
         api_version (str): Version of the API to access
