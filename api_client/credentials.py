@@ -7,7 +7,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 class APICredentials:
     """
-    Class defining credentials needed for API Client to access the API on behalf of our app
+    Class defining credentials needed for API Client to access API on behalf of our app
     Attributes:
         SCOPES (str): Access level we are requesting (e.g. read only)
         credentials_filepath (str): filepath of JSON file containing Client ID and Client Secret for our app
@@ -29,28 +29,25 @@ class APICredentials:
     def generate_credentials(self):
         """
         Utilizes credentials.json and token.json to create credentials for our app
-        If no user authentication created yet, calls initialize_authentication to create tokens
+        If no user authentication created yet (no 'tokens.json' file found), calls initialize_authentication to create tokens
         """
-        creds = None
-        # The file token.json stores the user's access and refresh tokens, and is
-        # created automatically when the authorization flow completes for the first
-        # time.
+        user_creds = None
         
         # If valid creds already exist, use them 
         if os.path.exists(self.token_filepath) and os.path.getsize(self.token_filepath)>0:
-            creds = Credentials.from_authorized_user_file(self.token_filepath, self.SCOPES)
+            user_creds = Credentials.from_authorized_user_file(self.token_filepath, self.SCOPES)
         # If there are no (valid) creds available
-        if not creds or not creds.valid:
+        if not user_creds or not user_creds.valid:
             # If there are creds and they're just expired, refresh them
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
+            if user_creds and user_creds.expired and user_creds.refresh_token:
+                user_creds.refresh(Request())
             # If there are no creds at all (i.e. first-time user)
             else:
-                creds = self.initialize_authentication()
+                user_creds = self.initialize_authentication()
             # Save credentials to 'token.json' file for next run
             with open(self.token_filepath, "w") as token:
-                token.write(creds.to_json())
-        return creds
+                token.write(user_creds.to_json())
+        return user_creds
     
     def initialize_authentication(self):
         """
