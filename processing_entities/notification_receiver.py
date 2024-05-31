@@ -6,7 +6,7 @@ import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-class NotificationProcessor(ProcessingEntity):
+class NotificationReceiver(ProcessingEntity):
     """
     Class responsible for processing messages incoming from Gmail inbox
     Subclass of ProcessingEntity
@@ -97,6 +97,6 @@ class NotificationProcessor(ProcessingEntity):
         except FileNotFoundError:
             return None
         
-notification_processor = NotificationProcessor(input_subscription_name="gmail-inbox-topic-sub", 
+notification_receiver = NotificationReceiver(input_subscription_name="gmail-inbox-topic-sub", 
                                                output_topic_name="gmail-all-notification-topic",
                                                last_history_id_filename="last_history_id.txt")
