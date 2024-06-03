@@ -1,3 +1,4 @@
 # Ignore credentials and token files
 *.json
+config/
 attachments/
